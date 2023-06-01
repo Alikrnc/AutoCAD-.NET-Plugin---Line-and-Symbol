@@ -1,0 +1,6 @@
+D:\Yazılım\Okul\Bitirme Projesi\Deneme\Debug\Line and Symbol.dll
+D:\Yazılım\Okul\Bitirme Projesi\Deneme\Debug\Line and Symbol.pdb
+D:\Yazılım\Okul\Bitirme Projesi\Deneme\Line and Symbol\obj\Debug\Line and Symbol.csproj.AssemblyReference.cache
+D:\Yazılım\Okul\Bitirme Projesi\Deneme\Line and Symbol\obj\Debug\Line and Symbol.csproj.CoreCompileInputs.cache
+D:\Yazılım\Okul\Bitirme Projesi\Deneme\Line and Symbol\obj\Debug\Line and Symbol.dll
+D:\Yazılım\Okul\Bitirme Projesi\Deneme\Line and Symbol\obj\Debug\Line and Symbol.pdb
