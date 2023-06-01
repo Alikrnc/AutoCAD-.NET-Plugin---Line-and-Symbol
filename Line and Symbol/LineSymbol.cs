@@ -89,11 +89,11 @@ namespace Line_and_Symbol
             SortiLayer();
                         
             // By using Editor we can communicate with users in AutoCAD application.
-            ed.WriteMessage("\nRehber için LSGuide komutunu kullanınız");
+            ed.WriteMessage("\nPlease use the LSGuide command for the guide.");
         }
 
-        [CommandMethod("Linye")]       // Line in English
-        public void LinyeCiz()         // This method is used to draw electrical lines
+        [CommandMethod("MainLine")]       // Line
+        public void LinyeCiz()         // This method is used to draw electrical lines.
         {
             // In order to use layers, drawings (line, circle ...), etc. we must reach
             // the Database element in the hierarchy. We reach it with the Document element.
@@ -136,21 +136,21 @@ namespace Line_and_Symbol
                         {
                             once = 0;    // Won't execute again.
 
-                            if (layerTable.Has("Linye (LS)"))                  // If there is specific named layer...
+                            if (layerTable.Has("Line (LS)"))                  // If there is specific named layer...
                             {
-                                ObjectId layerId = layerTable["Linye (LS)"];   // Get the ID of the named layer.
+                                ObjectId layerId = layerTable["Line (LS)"];   // Get the ID of the named layer.
                                 db.Clayer = layerId;                           // Change current layer to the mentioned layer.
 
-                                ed.WriteMessage("Mevcut katman değiştirildi: " + "Linye (LS)");   // Inform user.
+                                ed.WriteMessage("The current layer has been changed: " + "Line (LS)");   // Inform user.
                             }
 
                             else // If the mentioned layer is not exist...
                             {
-                                ed.WriteMessage("Katman bulunamadı: " + "Linye (LS)");
+                                ed.WriteMessage("Layer not found: " + "Line (LS)");
                             }
 
                             PromptPointOptions ppo = new PromptPointOptions("");   // Reach point options.
-                            ppo.Message = ("\nBaşlangıç noktasını seçiniz:");   // Add a message to communicate with the user.
+                            ppo.Message = ("\nChoose the starting point:");   // Add a message to communicate with the user.
 
                             PromptPointResult ppr = ed.GetPoint(ppo);   // With using ppo, let the user select a point.
                             Point3d startingpoint = ppr.Value;          // Get the selected point value.
@@ -165,7 +165,7 @@ namespace Line_and_Symbol
                                 return;                  // Exit Loop
                             }
 
-                            ppo.Message = ("\nİkinci noktayı seçiniz, bu nokta uzaklık belirleyecektir:");
+                            ppo.Message = ("\nSelect the second point, this point will determine the distance:");
                             ppo.UseBasePoint = true;         // Draw temporary indicator between mouse and specific point.
                             ppo.BasePoint = startingpoint;   // Use startingpoint as basepoint.
                             ppr = ed.GetPoint(ppo);
@@ -188,7 +188,7 @@ namespace Line_and_Symbol
                             length += startingline.Length; // Length = 0 + length of the line
                                 
                             offset = length;   // Offset value will be same with the first drawed line.
-                            ed.WriteMessage("\nOffset değeri: " + offset);
+                            ed.WriteMessage("\nOffset value: " + offset);
 
                             btr.AppendEntity(startingline);                    // Add the line to the drawings database.
                             trs.AddNewlyCreatedDBObject(startingline, true);   // Add the new object to the transaction.
@@ -199,7 +199,7 @@ namespace Line_and_Symbol
                         {                            
                             PromptSelectionOptions pso = new PromptSelectionOptions();      // Reach selection options.
                             pso.SingleOnly = true;   // User can only select one line.
-                            pso.MessageForAdding = "\nParalel çizilecek duvarı seçiniz:";   // Add a message to the user.
+                            pso.MessageForAdding = "\nSelect the wall to draw parallel lines:";   // Add a message to the user.
                             PromptSelectionResult psr = ed.GetSelection(pso);               // Get the selected "thing".
 
                             if (psr.Status == PromptStatus.Cancel)
@@ -208,9 +208,9 @@ namespace Line_and_Symbol
 
                                 db.Clayer = prevLayer;
                                 wloop = 0;
-                                ed.WriteMessage("\nLinye hattı uzunluğu: " + length);   // Show the total length of the lines.
+                                ed.WriteMessage("\nLine length: " + length);   // Show the total length of the lines.
 
-                                string symst = "Buat (LS)";       // symst = symbol string
+                                string symst = "Junction Box (LS)";       // symst = symbol string
                                 SembolCiz(symst, lastpoint, 0);   // This method gets the block "symst" from block table
                                                                   // and adds it to the drawing database.
 
@@ -231,7 +231,7 @@ namespace Line_and_Symbol
 
                                     if (objtype != typeof(Line))   // We only work with lines
                                     {
-                                        ed.WriteMessage("\nSadece line tipindeki varlıklar için çalışır.");
+                                        ed.WriteMessage("\nOnly works for the entities of the line type.");
                                     }
 
                                     else
@@ -266,7 +266,7 @@ namespace Line_and_Symbol
 
                                         if (axis == 0) // none
                                         {
-                                            ed.WriteMessage("\nSadece yatay veya dikey line için çalışır. Eğer bu durumlardan eminseniz bu seçimi silip tekrar çiziniz.");
+                                            ed.WriteMessage("\nOnly works for horizontal or vertical lines. If you are sure of these conditions, delete this selection and redraw it.");
                                         }
 
                                         else if (axis == 1) // Horizontal - x coordinates changes
@@ -370,14 +370,14 @@ namespace Line_and_Symbol
 
                                 else
                                 {
-                                    ed.WriteMessage("\nVarlık bulunamadı.");
+                                    ed.WriteMessage("\nEntity not found.");
                                 }
 
                             }
 
                             else
                             {
-                                ed.WriteMessage("\nVarlık seçiniz.");
+                                ed.WriteMessage("\nSelect any entity.");
                             }
 
 
@@ -388,7 +388,7 @@ namespace Line_and_Symbol
                     catch   // If any error occurs...
                     {
                         db.Clayer = prevLayer;   // Return to the previous layer
-                        Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("\nProblem oluştu");
+                        Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("\nA problem occured.");
                     }
 
                     // We are creating a transaction and commiting in every loop
@@ -406,8 +406,8 @@ namespace Line_and_Symbol
 
         }
 
-        [CommandMethod("Sorti")]       // Branch Line (?) in English
-        public void SortiCiz()         // This method is used to draw branch lines (?).
+        [CommandMethod("Branching")]       // Branching
+        public void SortiCiz()         // This method is used to draw branching lines.
         {
             Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
@@ -444,20 +444,20 @@ namespace Line_and_Symbol
                         {
                             once = 0;
 
-                            if (layerTable.Has("Sorti (LS)"))
+                            if (layerTable.Has("Branching (LS)"))
                             {
-                                ObjectId layerId = layerTable["Sorti (LS)"];
+                                ObjectId layerId = layerTable["Branching (LS)"];
                                 db.Clayer = layerId;
-                                ed.WriteMessage("Mevcut katman değiştirildi: " + "Sorti (LS)");
+                                ed.WriteMessage("The current layer has been changed: " + "Branching (LS)");
                             }
 
                             else
                             {
-                                ed.WriteMessage("Katman bulunamadı: " + "Sorti (LS)");
+                                ed.WriteMessage("Layer not found: " + "Branching (LS)");
                             }
 
                             PromptPointOptions ppo = new PromptPointOptions("");
-                            ppo.Message = ("\nBuatın merkez noktasını seçiniz:");
+                            ppo.Message = ("\nSelect the center point of the junction box:");
 
                             PromptPointResult ppr = ed.GetPoint(ppo);
                             buatCenter = ppr.Value;
@@ -475,11 +475,11 @@ namespace Line_and_Symbol
                             }
 
                             PromptKeywordOptions pko = new PromptKeywordOptions("");   // Reach keyword options.
-                            pko.Keywords.Add("Aydınlatma");   // Add a keyword that can be used by user.
-                            pko.Keywords.Add("Elektrik");
+                            pko.Keywords.Add("Illumination");   // Add a keyword that can be used by user.
+                            pko.Keywords.Add("Electrical");
                             pko.Keywords.Add("");
                             pko.Keywords.Default = "";   // If nothing is selected it will be default keyword.
-                            pko.Message = ("\nAydınlatma sistemleri veya Elektrik sistemleri için ");
+                            pko.Message = ("\nFor Lighting fixtures or Electrical systems ");
 
                             PromptResult pkr = ed.GetKeywords(pko);   // Get the user input
                             kws = pkr.StringResult;                   // Get the result
@@ -500,10 +500,10 @@ namespace Line_and_Symbol
                             }
                         }   // End of if (once == 1)
 
-                        if (kws == "Aydınlatma")   // If user input is "Aydınlatma"...
+                        if (kws == "Illumination")   // If user input is "Aydınlatma"...
                         {
                             PromptPointOptions ppoDraw = new PromptPointOptions("");
-                            ppoDraw.Message = ("\nAydınlatmanın merkez noktasını seçiniz:");
+                            ppoDraw.Message = ("\nSelect the center point of the lighting fixture:");
 
                             PromptPointResult ppr = ed.GetPoint(ppoDraw);
                             Point3d pointAy = ppr.Value;
@@ -513,7 +513,7 @@ namespace Line_and_Symbol
                                 trs.Dispose();
 
                                 db.Clayer = prevLayer;
-                                ed.WriteMessage("\nToplam kablo uzunluğu: " + totalLength);
+                                ed.WriteMessage("\nTotal length of the lines: " + totalLength);
 
                                 wloop = 0;
 
@@ -525,18 +525,18 @@ namespace Line_and_Symbol
                             double length = aydinlatmaLine.Length;   // Get the length of the drawed line
                             totalLength += length;
 
-                            ed.WriteMessage("\nTek kablo uzunluğu: " + length);
+                            ed.WriteMessage("\nSingle line length: " + length);
 
                             btr.AppendEntity(aydinlatmaLine);
                             trs.AddNewlyCreatedDBObject(aydinlatmaLine, true);
 
                             PromptKeywordOptions pkoAy = new PromptKeywordOptions("");
-                            pkoAy.Keywords.Add("Aplik");
-                            pkoAy.Keywords.Add("aRmatur");
-                            pkoAy.Keywords.Add("aVize");
+                            pkoAy.Keywords.Add("Sconce");
+                            pkoAy.Keywords.Add("Armature");
+                            pkoAy.Keywords.Add("Chandelier");
                             pkoAy.Keywords.Add("");
                             pkoAy.Keywords.Default = "";
-                            pkoAy.Message = ("\nAydınlatma sistemleri ");
+                            pkoAy.Message = ("\nLighting fixtures ");
                             string kwsAy = "";
 
                             PromptResult pkrAy = ed.GetKeywords(pkoAy);
@@ -547,28 +547,28 @@ namespace Line_and_Symbol
                                 trs.Dispose();
 
                                 db.Clayer = prevLayer;
-                                ed.WriteMessage("\nToplam kablo uzunluğu: " + totalLength);
+                                ed.WriteMessage("\nTotal length of the lines: " + totalLength);
 
                                 wloop = 0;
 
                                 return;
                             }
 
-                            if (kwsAy == "Aplik")
+                            if (kwsAy == "Sconce")
                             {
-                                string symst = "Aplik (LS)";
+                                string symst = "Sconce (LS)";
                                 SembolCiz(symst, pointAy, 0);
                             }
 
-                            else if (kwsAy == "aRmatur")
+                            else if (kwsAy == "Armature")
                             {
-                                string symst = "Armatur (LS)";
+                                string symst = "Armature (LS)";
                                 SembolCiz(symst, pointAy, 0);
                             }
 
-                            else if (kwsAy == "aVize")
+                            else if (kwsAy == "Chandelier")
                             {
-                                string symst = "Avize (LS)";
+                                string symst = "Chandelier (LS)";
                                 SembolCiz(symst, pointAy, 0);
                             }
 
@@ -578,17 +578,17 @@ namespace Line_and_Symbol
                             }
                         }
                         
-                        else if (kws == "Elektrik")
+                        else if (kws == "Electrical")
                         {
                             PromptPointOptions ppoEl = new PromptPointOptions("");
-                            ppoEl.Keywords.Add("Priz");        // You can also add keyword input to the point options.
-                            ppoEl.Keywords.Add("Komutator");   // By that way the user can choose a point or keyword.
-                            ppoEl.Keywords.Add("Anahtar");
-                            ppoEl.Keywords.Add("Buat");
-                            ppoEl.Keywords.Add("Ciz");
+                            ppoEl.Keywords.Add("Socket");        // You can also add keyword input to the point options.
+                            ppoEl.Keywords.Add("Commutator");   // By that way the user can choose a point or keyword.
+                            ppoEl.Keywords.Add("sWtich");
+                            ppoEl.Keywords.Add("JunctionBox");
+                            ppoEl.Keywords.Add("Draw");
                             ppoEl.Keywords.Add("");
                             ppoEl.Keywords.Default = "";
-                            ppoEl.Message = ("\nHat çizmek veya elektrik elemanı yerleştirmek için nokta seçiniz ya da ");
+                            ppoEl.Message = ("\nSelect point to draw lines or place electrical elements, or ");
                             ppoEl.UseBasePoint = true;
                             ppoEl.BasePoint = lastPointEl;
 
@@ -606,20 +606,20 @@ namespace Line_and_Symbol
                                 trs.Dispose();
 
                                 db.Clayer = prevLayer;
-                                ed.WriteMessage("\nToplam kablo uzunluğu: " + totalLength);
+                                ed.WriteMessage("\nTotal length of the lines: " + totalLength);
 
                                 wloop = 0;
 
                                 return;
                             }
 
-                            else if (kwsEl == "Priz")
+                            else if (kwsEl == "Socket")
                             {
                                 // The user will be asked for a point to place the electrical element.
                                 // After that a line will be created alongside with the placed symbol.
 
                                 PromptPointOptions ppoEl2 = new PromptPointOptions("");
-                                ppoEl2.Message = ("\nElektrik elemanı yerleştirmek için için nokta seçiniz: ");
+                                ppoEl2.Message = ("\nSelect the point to place the electrical element: ");
                                 ppoEl2.UseBasePoint = true;
                                 ppoEl2.BasePoint = lastPointEl;
 
@@ -634,16 +634,16 @@ namespace Line_and_Symbol
                                 btr.AppendEntity(componentLine);
                                 trs.AddNewlyCreatedDBObject(componentLine, true);
 
-                                ed.WriteMessage("\nTek kablo uzunluğu: " + componentLength);
+                                ed.WriteMessage("\nSingle line length: " + componentLength);
 
-                                string symst = "Priz (LS)";
+                                string symst = "Socket (LS)";
                                 SembolCiz(symst, componentPoint, 0);
                             }
 
-                            else if (kwsEl == "Komutator")
+                            else if (kwsEl == "Commutator")
                             {
                                 PromptPointOptions ppoEl2 = new PromptPointOptions("");
-                                ppoEl2.Message = ("\nElektrik elemanı yerleştirmek için için nokta seçiniz: ");
+                                ppoEl2.Message = ("\nSelect the point to place the electrical element: ");
                                 ppoEl2.UseBasePoint = true;
                                 ppoEl2.BasePoint = lastPointEl;
 
@@ -658,16 +658,16 @@ namespace Line_and_Symbol
                                 btr.AppendEntity(componentLine);
                                 trs.AddNewlyCreatedDBObject(componentLine, true);
 
-                                ed.WriteMessage("\nTek kablo uzunluğu: " + componentLength);
+                                ed.WriteMessage("\nSingle line length: " + componentLength);
 
-                                string symst = "Komutator (LS)";
+                                string symst = "Commutator Switch (LS)";
                                 SembolCiz(symst, componentPoint, 0);
                             }
 
-                            else if (kwsEl == "Anahtar")
+                            else if (kwsEl == "sWtich")
                             {
                                 PromptPointOptions ppoEl2 = new PromptPointOptions("");
-                                ppoEl2.Message = ("\nElektrik elemanı yerleştirmek için nokta seçiniz: ");
+                                ppoEl2.Message = ("\nSelect the point to place the electrical element: ");
                                 ppoEl2.UseBasePoint = true;
                                 ppoEl2.BasePoint = lastPointEl;
 
@@ -682,16 +682,16 @@ namespace Line_and_Symbol
                                 btr.AppendEntity(componentLine);
                                 trs.AddNewlyCreatedDBObject(componentLine, true);
 
-                                ed.WriteMessage("\nTek kablo uzunluğu: " + componentLength);
+                                ed.WriteMessage("\nSingle line length: " + componentLength);
 
-                                string symst = "Anahtar (LS)";
+                                string symst = "Switch (LS)";
                                 SembolCiz(symst, componentPoint, 0);
                             }
 
-                            else if (kwsEl == "Buat")
+                            else if (kwsEl == "JunctionBox")
                             {
                                 PromptPointOptions ppoEl2 = new PromptPointOptions("");
-                                ppoEl2.Message = ("\nElektrik elemanı yerleştirmek için nokta seçiniz: ");
+                                ppoEl2.Message = ("\nSelect the point to place the electrical element: ");
                                 ppoEl2.UseBasePoint = true;
                                 ppoEl2.BasePoint = lastPointEl;
 
@@ -706,16 +706,16 @@ namespace Line_and_Symbol
                                 btr.AppendEntity(componentLine);
                                 trs.AddNewlyCreatedDBObject(componentLine, true);
 
-                                ed.WriteMessage("\nTek kablo uzunluğu: " + componentLength);
+                                ed.WriteMessage("\nSingle line length: " + componentLength);
 
-                                string symst = "Buat (LS)";
+                                string symst = "Junction Box (LS)";
                                 SembolCiz(symst, componentPoint, 0);
                             }
 
-                            else if (kwsEl == "Ciz")   // If this keyword is selected the command will end.
+                            else if (kwsEl == "Draw")   // If this keyword is selected the command will end.
                             {
                                 db.Clayer = prevLayer;
-                                ed.WriteMessage("\nToplam kablo uzunluğu: " + totalLength);   // Total length will be written.
+                                ed.WriteMessage("\nTotal length of the lines: " + totalLength);   // Total length will be written.
 
                                 wloop = 0;
                             }
@@ -729,7 +729,7 @@ namespace Line_and_Symbol
                                 double length = elektrikLine.Length;
                                 totalLength += length;
 
-                                ed.WriteMessage("\nTek kablo uzunluğu: " + length);
+                                ed.WriteMessage("\nSingle line length: " + length);
 
                                 btr.AppendEntity(elektrikLine);
                                 trs.AddNewlyCreatedDBObject(elektrikLine, true);
@@ -758,7 +758,7 @@ namespace Line_and_Symbol
 
         }
 
-        [CommandMethod("Aydinlat")]    // Illuminate in English
+        [CommandMethod("Illuminate")]    // Illuminate in English
         public void Aydinlatma()       // This method calculates the area of the region within 4 points.
         {
             Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
@@ -778,7 +778,7 @@ namespace Line_and_Symbol
 
                 List<Point3d> corners = new List<Point3d>();   // Created a list of points
 
-                ppo.Message = "\nAydınlatmak istediğiniz dörtgenin köşesini seçiniz:";
+                ppo.Message = "\nSelect the corner of the rectangle you want to illuminate: ";
 
                 ppr = ed.GetPoint(ppo);
                 Point3d corner_first = ppr.Value;
@@ -788,7 +788,7 @@ namespace Line_and_Symbol
 
                 for (int kose = 1; kose < 4; kose++)   // We already got the 0th index so it will get 1 to 3.
                 {
-                    ppo.Message = "\nAydınlatmak istediğiniz dörtgenin diğer köşesini seçiniz: ";
+                    ppo.Message = "\nSelect the other corner of the rectangle you want to illuminate: ";
                     ppr = ed.GetPoint(ppo);
                     Point3d corner = ppr.Value;
 
@@ -857,18 +857,18 @@ namespace Line_and_Symbol
 
                 scaled_area = area / (50 * 50);
                 scaled_per = per / 50;
-                ed.WriteMessage("\n\n1/50 ölçek için alan: {0}", scaled_area);
-                ed.WriteMessage("\n1/50 ölçek için çevre: {0}", scaled_per);
+                ed.WriteMessage("\n\nArea for 1/50 scale: {0}", scaled_area);
+                ed.WriteMessage("\nPerimeter for 1/50 scale: {0}", scaled_per);
 
                 scaled_area = area / (100 * 100);
                 scaled_per = per / 100;
-                ed.WriteMessage("\n\n1/100 ölçek için alan: {0}", scaled_area);
-                ed.WriteMessage("\n1/100 ölçek için çevre: {0}", scaled_per);
+                ed.WriteMessage("\n\nArea for 1/100 scale: {0}", scaled_area);
+                ed.WriteMessage("\nPerimeter for 1/100 scale: {0}", scaled_per);
 
                 scaled_area = area / (200 * 200);
                 scaled_per = per / 200;
-                ed.WriteMessage("\n\n1/200 ölçek için alan: {0}", scaled_area);
-                ed.WriteMessage("\n1/200 ölçek için çevre: {0}", scaled_per);
+                ed.WriteMessage("\n\nArea for 1/200 scale: {0}", scaled_area);
+                ed.WriteMessage("\nPerimeter for 1/200 scale: {0}", scaled_per);
 
 
                 trs.Commit();
@@ -876,10 +876,10 @@ namespace Line_and_Symbol
 
         }
 
-        [CommandMethod("Buat")]        // Junction Box
+        [CommandMethod("JunctionBox")]        // Junction Box
         public void BuatCiz()
         {
-            string symst = "Buat (LS)";
+            string symst = "Junction Box (LS)";
 
             // Since our method is SembolCiz(symbol name, drawing center, skip drawing center)
             // when we use the method with 1 value (default 1) of skip drawing center
@@ -888,45 +888,45 @@ namespace Line_and_Symbol
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
-        [CommandMethod("Komutator")]   // Commutator Switch
+        [CommandMethod("CommutatorSwitch")]   // Commutator Switch
         public void KomutatorCiz()
         {
-            string symst = "Komutator (LS)";
+            string symst = "Commutator Switch (LS)";
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
-        [CommandMethod("Priz")]        // Socket
+        [CommandMethod("Socket")]        // Socket
         public void PrizCiz()
         {
-            string symst = "Priz (LS)";
+            string symst = "Socket (LS)";
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
-        [CommandMethod("Anahtar")]     // Switch
+        [CommandMethod("Switch")]     // Switch
         public void AnahtarCiz()
         {
-            string symst = "Anahtar (LS)";
+            string symst = "Switch (LS)";
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
-        [CommandMethod("Aplik")]       // Sconce
+        [CommandMethod("Sconce")]       // Sconce
         public void AplikCiz()
         {
-            string symst = "Aplik (LS)";
+            string symst = "Sconce (LS)";
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
-        [CommandMethod("Armatur")]     // Armature (Lightning Fixture)
+        [CommandMethod("Armature")]     // Armature (Lighting Fixture)
         public void ArmaturCiz()
         {
-            string symst = "Armatur (LS)";
+            string symst = "Armature (LS)";
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
-        [CommandMethod("Avize")]       // Chandelier
+        [CommandMethod("Chandelier")]       // Chandelier
         public void AvizeCiz()
         {
-            string symst = "Avize (LS)";
+            string symst = "Chandelier (LS)";
             SembolCiz(symst, new Point3d(0, 0, 0));
         }
 
@@ -944,11 +944,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Buat (LS)"))   // If there are not any block with the same name...
+                if (!bt.Has("Junction Box (LS)"))   // If there are not any block with the same name...
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())   // Create a new btr
                     {
-                        btr.Name = "Buat (LS)";              // Name the block
+                        btr.Name = "Junction Box (LS)";              // Name the block
                         btr.Origin = new Point3d(0, 0, 0);   // Set the origin of the block.
 
                        
@@ -976,7 +976,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nBuat bloğu zaten mevcut.");
+                    ed.WriteMessage("\nJunction Box block already exists.");
                 }
 
                 trs.Commit();
@@ -994,11 +994,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Komutator (LS)"))
+                if (!bt.Has("Commutator Switch (LS)"))
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())
                     {
-                        btr.Name = "Komutator (LS)";
+                        btr.Name = "Commutator Switch (LS)";
                         btr.Origin = new Point3d(0, 0, 0);
 
                         Circle circle = new Circle
@@ -1032,7 +1032,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nKomütatör bloğu zaten mevcut.");
+                    ed.WriteMessage("\nCommutator Switch block already exists.");
                 }
 
                 trs.Commit();
@@ -1050,11 +1050,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Priz (LS)"))
+                if (!bt.Has("Socket (LS)"))
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())
                     {
-                        btr.Name = "Priz (LS)";
+                        btr.Name = "Socket (LS)";
                         btr.Origin = new Point3d(0, 0, 0);
 
                         Arc arc = new Arc(new Point3d(30, 0, 0), 10, 1.570796, 4.712389); // arc = center, radius, start angle (radian), end angle (radian)
@@ -1079,7 +1079,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nPriz bloğu zaten mevcut.");
+                    ed.WriteMessage("\nSocket block already exists.");
                 }
 
                 trs.Commit();
@@ -1097,11 +1097,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Anahtar (LS)"))
+                if (!bt.Has("Switch (LS)"))
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())
                     {
-                        btr.Name = "Anahtar (LS)";
+                        btr.Name = "Switch (LS)";
                         btr.Origin = new Point3d(0, 0, 0);
 
                         Circle circle = new Circle
@@ -1129,7 +1129,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nAnahtar bloğu zaten mevcut.");
+                    ed.WriteMessage("\nSwitch block already exists.");
                 }
 
                 trs.Commit();
@@ -1147,11 +1147,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Aplik (LS)"))
+                if (!bt.Has("Sconce (LS)"))
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())
                     {
-                        btr.Name = "Aplik (LS)";
+                        btr.Name = "Sconce (LS)";
                         btr.Origin = new Point3d(0, 0, 0);
 
                         Line line_h = new Line(new Point3d(0, 0, 0), new Point3d(25, 0, 0));
@@ -1177,7 +1177,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nAplik bloğu zaten mevcut.");
+                    ed.WriteMessage("\nSconce block already exists.");
                 }
 
                 trs.Commit();
@@ -1195,11 +1195,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Armatur (LS)"))
+                if (!bt.Has("Armature (LS)"))
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())
                     {
-                        btr.Name = "Armatur (LS)";
+                        btr.Name = "Armature (LS)";
                         btr.Origin = new Point3d(0, 0, 0);
 
                         Line line_x_one = new Line(new Point3d(5.3033, -5.3033, 0), new Point3d(-5.3033, 5.3033, 0));
@@ -1219,7 +1219,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nArmatur bloğu zaten mevcut.");
+                    ed.WriteMessage("\nArmature block already exists.");
                 }
 
                 trs.Commit();
@@ -1237,11 +1237,11 @@ namespace Line_and_Symbol
                 BlockTable bt;
                 bt = trs.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
-                if (!bt.Has("Avize (LS)"))
+                if (!bt.Has("Chandelier (LS)"))
                 {
                     using (BlockTableRecord btr = new BlockTableRecord())
                     {
-                        btr.Name = "Avize (LS)";
+                        btr.Name = "Chandelier (LS)";
                         btr.Origin = new Point3d(0, 0, 0);
 
                         Circle circle = new Circle
@@ -1269,7 +1269,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nAvize bloğu zaten mevcut.");
+                    ed.WriteMessage("\nChandelier block already exists.");
                 }
 
                 trs.Commit();
@@ -1290,11 +1290,11 @@ namespace Line_and_Symbol
                 LayerTable lt;
                 lt = trs.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
 
-                if (!lt.Has("Linye (LS)"))   // If there are not any layer with the same name...
+                if (!lt.Has("Line (LS)"))   // If there are not any layer with the same name...
                 {
                     using (LayerTableRecord ltr = new LayerTableRecord())
                     {
-                        ltr.Name = "Linye (LS)";   // Layer name
+                        ltr.Name = "Line (LS)";   // Layer name
 
                         // Define layer color.
                         ltr.Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(ColorMethod.ByAci, 80);
@@ -1307,14 +1307,14 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nLinye katmanı zaten mevcut.");
+                    ed.WriteMessage("\nLine layer already exists.");
                 }
 
                 trs.Commit();
             }
         }
         
-        private void SortiLayer()   // Branch Line Layer
+        private void SortiLayer()   // Branching Line Layer
         {
             Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
@@ -1325,11 +1325,11 @@ namespace Line_and_Symbol
                 LayerTable lt;
                 lt = trs.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
 
-                if (!lt.Has("Sorti (LS)"))
+                if (!lt.Has("Branching (LS)"))
                 {
                     using (LayerTableRecord ltr = new LayerTableRecord())
                     {
-                        ltr.Name = "Sorti (LS)";
+                        ltr.Name = "Branching (LS)";
                         ltr.Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(ColorMethod.ByAci, 80);
 
                         lt.UpgradeOpen();
@@ -1340,7 +1340,7 @@ namespace Line_and_Symbol
 
                 else
                 {
-                    ed.WriteMessage("\nSorti katmanı zaten mevcut.");
+                    ed.WriteMessage("\nBranching layer already exists.");
                 }
 
                 trs.Commit();
@@ -1421,11 +1421,11 @@ namespace Line_and_Symbol
                         ppo.Keywords.Add("rEverse");
                         ppo.Keywords.Add("");
                         ppo.Keywords.Default = "";
-                        ppo.Message = ("\nBaşlangıç noktasını seçiniz yada çevirmek için ");
+                        ppo.Message = ("\nSelect the starting point or to rotate ");
 
-                        if (symst == "Avize (LS)" || symst == "Armatur (LS)" || symst == "Buat (LS)")
+                        if (symst == "Chandelier (LS)" || symst == "Armature (LS)" || symst == "Junction Box (LS)")
                         {                            
-                            ppo.Message = ("\nMerkez noktasını seçiniz: ");
+                            ppo.Message = ("\nSelect the center point: ");
                             ppo.Keywords.Clear(); // There symbols do not have any direction so it is useless to rotate them.
                         }
 
@@ -1506,7 +1506,7 @@ namespace Line_and_Symbol
                         Matrix3d curUCSMatrix = ed.CurrentUserCoordinateSystem;
                         CoordinateSystem3d curUCS = curUCSMatrix.CoordinateSystem3d;
 
-                        if (symst == "Avize (LS)" || symst == "Armatur (LS)" || symst == "Buat (LS)")
+                        if (symst == "Chandelier (LS)" || symst == "Armature (LS)" || symst == "Junction Box (LS)")
                         {
                             if (brecId != ObjectId.Null)
                             {
@@ -1526,9 +1526,9 @@ namespace Line_and_Symbol
                             PromptKeywordOptions pko = new PromptKeywordOptions("");
                             pko.Keywords.Add("Rotate");
                             pko.Keywords.Add("rEverse");
-                            pko.Keywords.Add("Ciz");
-                            pko.Keywords.Default = "Ciz";
-                            pko.Message = ("\nÇevirmek ya da Çizimi tamamlamak için ");
+                            pko.Keywords.Add("Draw");
+                            pko.Keywords.Default = "Draw";
+                            pko.Message = ("\nTo rotate or complete the Drawing ");
 
                             PromptResult pkr = null;
                             string kws = "";
@@ -1586,7 +1586,7 @@ namespace Line_and_Symbol
 
                 catch
                 {
-                    Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog(symst + " bloğu bulunamadı.. komutunu giriniz.");
+                    Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog(symst + " block not found.");
                 }
 
                 trs.Commit();
@@ -1719,7 +1719,7 @@ namespace Line_and_Symbol
                 // probality to generate the same GUID so the palettes won't
                 // have the same GUID and duplicate.
 
-                _ps = new PaletteSet("PC", new Guid("4E99370C-4E9B-4A9C-A150-ED74359275CC"));   
+                _ps = new PaletteSet("PS", new Guid("4E99370C-4E9B-4A9C-A150-ED74359275CC"));   
 
                 _ps.Add("CMDPAL", uc);                           // Add the user control to the palette set.
                 _ps.MinimumSize = new Size(200, (i + 1) * 40);   // Set min size of the palette.
@@ -1747,8 +1747,8 @@ namespace Line_and_Symbol
             messageControl.BackColor = System.Drawing.Color.White;
             messageControl.AutoScroll = true;
 
-            var newPalette = new PaletteSet("Ana Menü");
-            newPalette.Add("GUIDEPAL", messageControl);
+            var newPalette = new PaletteSet("Empty");
+            newPalette.Add("Empty", messageControl);
             newPalette.Size = new Size(200, 150);
 
             // newPalette.Visible = true;   no need to use
@@ -1769,10 +1769,10 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();   // Creates a textbox.
-            messageBody.Text =    "\n   Merhaba!\n"
-                                + "\n   Hat ve Sembol rehberine hoş geldiniz! "
-                                + "Şuan ana menüdesiniz. "
-                                + "Aşağıdaki butonlara basarak rehberi kullanabilirsiniz.";
+            messageBody.Text =    "\n   Hello!\n"
+                                + "\n   Welcome to the Line and Symbol plugin guide! "
+                                + "You are now in the main menu. "
+                                + "You can use the guide by pressing the buttons below.";
             messageBody.Dock = WinForms.DockStyle.Top;                          // The text box will we at the top
             messageBody.ReadOnly = true;                                        // User can't edit the text
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;   // Vertical scrollbar
@@ -1784,8 +1784,8 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);   // Add messages to usercontrol
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Ana Menü");      // Create a palette set and name it
-            newPalette.Add("GUIDEPAL", messageControl);   // Palette tag, only used when multiple palettes are opened.
+            newPalette = new PaletteSet("Main Menu");      // Create a palette set and name it
+            newPalette.Add("MainMenu", messageControl);   // Palette tag, only used when multiple palettes are opened.
             newPalette.Size = new Size(200, 150);         // Default palette size
 
             LSButton(messageControl, newPalette);         // Add Buttons
@@ -1806,13 +1806,13 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();
-            messageBody.Text = "\n" + "   Hat ve Sembol (LS), "
-                                + "elektrik mühendislerinin çizimlerine "
-                                + "yardımcı olmak amacıyla yazılmış, "
-                                + "içeriğinde linye hattı, sorti hattı ve "
-                                + "elektrik sembolleri çizdirme komutları ile "
-                                + "aydınlatma hesabı yapan komutları olan "
-                                + "bir AutoCAD eklentisidir.";
+            messageBody.Text = "\n" + "   Line and Symbol (LS) "
+                                + "is an AutoCAD plugin written to "
+                                + "assist electrical engineers with drawings. "
+                                + "This plugin contains commands to draw lines, "
+                                + "draw branching lines, and draw electrical symbols. "
+                                + "There is also a command "
+                                + "to help calculate lighting fixtures.";
             messageBody.Dock = WinForms.DockStyle.Top;
             messageBody.ReadOnly = true;
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;
@@ -1821,7 +1821,7 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Hat ve Sembol Nedir?");
+            newPalette = new PaletteSet("What is Line and Symbol?");
             newPalette.Add("LS", messageControl);
             newPalette.Size = new Size(200, 150);
 
@@ -1843,15 +1843,10 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();
-            messageBody.Text = "\n" + "   Linye hattı çizdirme, sorti "
-                                + "hattı çizdirme ve aydınlatma hesabı "
-                                + "komutu olarak 3 çeşit komut ile "
-                                + "her sembolün ayrı ayrı çizimleri "
-                                + "için sembol komutları bulunmaktadır. "
-                                + "\n\n   Bu komutları aşağıdaki butonlar "
-                                + "aracılığı ile inceleyebilirsiniz. "
-                                + "\n\n   UYARI: Komutları kullanırken türkçe "
-                                + "karakterler kullanmak sorunlara sebep olabilir.";
+            messageBody.Text = "\n" + "   There are 3 types of commands that are line"
+                                + " drawing commands, lighting calculation command and "
+                                + "commands of the symbols for drawing each symbol separately. "
+                                + "\n\nYou can review these commands in this guide. ";
             messageBody.Dock = WinForms.DockStyle.Top;
             messageBody.ReadOnly = true;
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;
@@ -1860,8 +1855,8 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Komutlar");
-            newPalette.Add("LS", messageControl);
+            newPalette = new PaletteSet("Commands");
+            newPalette.Add("Commands", messageControl);
             newPalette.Size = new Size(200, 150);
 
             LinyeButton(messageControl, newPalette);
@@ -1885,28 +1880,28 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();
-            messageBody.Text = "\n" + "   Linye komutu, komut satırına "
-                                + "\"Linye\" yazarak kullanılır. "
-                                + "\n\n   Linye komutu yazıldığında mevcut "
-                                + "çizim katmanı \"Linye\" katmanı ile "
-                                + "değiştirilecektir ve komut bittiğinde ise "
-                                + "en son seçili olan katmana geçiş sağlanacaktır. "
-                                + "\n\n   Linye komutunu kullandıktan sonra "
-                                + "kullanıcıdan bir nokta istenecektir, bu nokta "
-                                + "başlangıç noktası olacaktır, bu nokta seçildikten "
-                                + "sonra ikinci bir nokta seçilmesi istenecektir. "
-                                + "Birinci seçilen noktadan ikinci noktaya kablo çekilecek "
-                                + "ve bu kablonun uzunluğu çizilecek hat ile seçilen "
-                                + "duvarlar arasındaki mesafeyi (offset) belirleyecektir. "
-                                + "\n\n   İkinci nokta da seçildikten sonra kullanıcı \"ESC\" "
-                                + "tuşuna basana kadar bir duvar seçilmesi istenecektir. "
-                                + "Seçilen duvar yatay ise hat dikey olarak yaklaşacak, "
-                                + "duvar dikey ise hat yatay olarak yaklaşacaktır. "
-                                + "Eğer aynı duvar iki kez seçilirse kablo "
-                                + "duvarın içinden geçecektir. "
-                                + "\"ESC\" tuşuna basıldıktan sonra ise hattın sonuna "
-                                + "buat yerleştirilerek hat uzunluğu verilecektir."
-                                + "\n\n   UYARI: Uzunluk hesabını yaparken ölçekleri dikkate alınız!";
+            messageBody.Text = "\n" + "   The Line command is used by typing “Mainline” on the command line."
+                                + "\n\n   When the “Mainline” command is typed, the current "
+                                + "drawing layer will be replaced with the “Line” layer, "
+                                + "and when the command is finished, the last selected "
+                                + "layer will be switched again."
+                                + "\n\n   After using the “Mainline” command, the user will "
+                                + "be prompted for a point, this point will be the "
+                                + "starting point, and after selecting this point, "
+                                + "a second point will be requested. "
+                                + "The cable will be drawn from the first selected point to the second "
+                                + "point and the length of this cable will determine "
+                                + "the distance (offset) between the line to be drawn and the selected walls. "
+                                + "\n\n   Once the second point is also selected, "
+                                + "a wall (horizontal or vertical line) will be "
+                                + "prompted until the user presses the \"ESC\" key. "
+                                + "If the selected wall is horizontal, the line will approach "
+                                + "vertically, if the wall is vertical, the line will approach horizontally. "
+                                + "If the same wall is selected twice, the cable will pass through the wall. "
+                                + "After pressing the \"ESC\" key, the junction box will be "
+                                + "placed at the end of the line and the line length will be given."
+                                + "\n\n   WARNING: Take the scales into consideration " 
+                                + "when calculating the length!";
             messageBody.Dock = WinForms.DockStyle.Top;
             messageBody.ReadOnly = true;
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;
@@ -1915,8 +1910,8 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Linye Komutu");
-            newPalette.Add("LS", messageControl);
+            newPalette = new PaletteSet("Line Command");
+            newPalette.Add("Line", messageControl);
             newPalette.Size = new Size(200, 150);
 
             BackButton(messageControl, newPalette);
@@ -1937,38 +1932,35 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();
-            messageBody.Text = "\n" + "   Sorti komutu, komut satırına "
-                                + "\"Sorti\" yazarak kullanılır. "
-                                + "\n\n   Sorti komutu yazıldığında mevcut "
-                                + "çizim katmanı \"Sorti\" katmanı ile "
-                                + "değiştirilecektir ve komut bittiğinde ise "
-                                + "en son seçili olan katmana geçiş sağlanacaktır. "
-                                + "\n\n   Sorti komutunu kullandıktan sonra "
-                                + "kullanıcıdan bir nokta istenecektir, bu nokta "
-                                + "başlangıç noktası olacaktır, bu nokta seçildikten "
-                                + "sonra kullanıcıdan \"Aydınlatma\" veya \"Elektrik\" "
-                                + "komutlarından biri istenecektir, bu komutlar "
-                                + "iki moddan birini etkinleştirecektir. "
-                                + "\n\n   Aydınlatma modunda kullanıcıdan "
-                                + "bir nokta seçimi ile aydınlatma elemanı "
-                                + "seçimi istenecektir. Başlangıç noktasından "
-                                + "belirtilen noktaya çizgi çekilerek seçilen eleman "
-                                + "yerleştirilecektir ve kablo uzunluğu verilecektir, "
-                                + "seçilen eleman \"R\" veya \"E\" tuşları ile döndürülebilir. "
-                                + "\"ESC\" tuşuna basılana kadar nokta seçimi ve "
-                                + "eleman seçimi tekrar ederek başlangıç noktasından "
-                                + "çizim yapılmaya devam edilecektir."
-                                + "\n\n   Elektrik modunda ise kullanıcıdan "
-                                + "bir nokta seçimi veya elektrik elemanı "
-                                + "seçimi istenecektir. Nokta seçimi yapılırsa "
-                                + "birinci noktadan ikinci noktaya bir hat çekilecek "
-                                + "ve kablo uzunluğu verilecektir, eleman seçimi yapılırsa "
-                                + "elemanın yerleştirileceği noktanın seçilmesi istenecektir. "
-                                + "Nokta seçimi yapıldıktan sonra \"R\" veya \"E\" tuşları "
-                                + "ile elemanı döndürme işlemi yapılabilir. "
-                                + "\"ESC\" tuşuna basılana kadar son hat noktasından çizim "
-                                + "devam edecektir."
-                                + "\n\n   UYARI: Uzunluk hesabını yaparken ölçekleri dikkate alınız!";
+            messageBody.Text = "\n" + "   Branching command is used by typing " +
+                                "\"Branching\" on the command line. " +
+                                "When the “Branching” command is typed, the current drawing " +
+                                "layer will be replaced with the “Branching” layer, and when " +
+                                "the command is finished, the last selected layer will be switched again." +
+                                "\n\n   After using the “Branching” command, the user will be " +
+                                "prompted for a point, this point will be the starting point, " +
+                                "after selecting this point, the user will be prompted for either " +
+                                "“Illumination” or “Electrical” commands, " +
+                                "these commands will activate one of the two modes." +
+                                "\n\n   In the “Illumination” mode, the user will be " +
+                                "prompted to select a point and a lighting fixture. " +
+                                "The selected element will be placed by drawing a line " +
+                                "from the starting point to the specified point and the cable " +
+                                "length will be given, the selected element can be rotated " +
+                                "with the “R” or “E” keys. The drawing will continue " +
+                                "from the starting point by repeating the point selection and " +
+                                "element selection until the “ESC” key is pressed." +
+                                "\n\n   In “Electrical” mode, the user will be prompted for " +
+                                "a point selection or electrical element selection. " +
+                                "If point selection is made, a line will be drawn from " +
+                                "the first point to the second point and the cable length will be given. " +
+                                "If the element is selected, the point where the element " +
+                                "will be placed will be requested. " +
+                                "After the point selection is made, the element can be rotated " +
+                                "with the “R” or “E” keys. The drawing will continue " +
+                                "from the last line point until the “ESC” key is pressed." +
+                                "\n\n   WARNING: Take the scales into consideration " +
+                                "when calculating the length!";
             messageBody.Dock = WinForms.DockStyle.Top;
             messageBody.ReadOnly = true;
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;
@@ -1977,8 +1969,8 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Sorti Komutu");
-            newPalette.Add("LS", messageControl);
+            newPalette = new PaletteSet("Branching Command");
+            newPalette.Add("Branching", messageControl);
             newPalette.Size = new Size(200, 150);
 
             BackButton(messageControl, newPalette);
@@ -1999,19 +1991,20 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();
-            messageBody.Text = "\n" + "   Aydınlatma komutu, komut satırına "
-                                + "\"Aydınlat\" yazarak kullanılır. "
-                                + "\n\n   Aydınlat komutu sizden sırasıyla 4 nokta "
-                                + "seçmenizi isteyecektir. Seçilen bu noktalar ile "
-                                + "alan hesabı yapılacak ve merkeze bir adet çember "
-                                + "yerleştirilecektir. Bu çemberin merkezi, seçilen 4 "
-                                + "noktanın merkezi ile aynıdır."
-                                + "\n\n   Alan hesabına göre aydınlatma "
-                                + "hesabı yapabilir, yerleştirilen çemberi "
-                                + "odanın merkezi olarak referans alarak " 
-                                + "odanın içine ışıklandırmaları yerleştirebilirsiniz. "
-                                + "\n\n   UYARI: Dörtgen olmayan şekiller nedeniyle veya "
-                                + "ölçeklendirme nedeniyle alan hesabında farklar oluşabilir!";
+            messageBody.Text = "\n" + "   The illumation command is used by typing " +
+                                "“Illuminate” on the command line. " +
+                                "\n\n   The illuminate command will prompt you to select " +
+                                "4 points in order. With these selected points, " +
+                                "the area calculation will be made and a circle " +
+                                "will be placed in the center. The center of this circle " +
+                                "is the same as the center of the 4 selected points. " +
+                                "\n\n   You can calculate the lighting elements " +
+                                "(Lux, Lumen, Lightning fixture count, etc.) " +
+                                "according to the area calculation, " +
+                                "you can place the lights inside the room " +
+                                "by referring to the placed circle as the center of the room. " +
+                                "\n\n   WARNING: Differences in area calculation and " +
+                                "center placement may occur due to non - quadrilateral shapes or scaling!";
             messageBody.Dock = WinForms.DockStyle.Top;
             messageBody.ReadOnly = true;
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;
@@ -2020,8 +2013,8 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Aydınlat Komutu");
-            newPalette.Add("LS", messageControl);
+            newPalette = new PaletteSet("Illuminate Command");
+            newPalette.Add("Illuminate", messageControl);
             newPalette.Size = new Size(200, 150);
 
             BackButton(messageControl, newPalette);
@@ -2042,23 +2035,23 @@ namespace Line_and_Symbol
             messageControl.AutoScroll = true;
 
             var messageBody = new WinForms.RichTextBox();
-            messageBody.Text = "\n" + "   Kütüphane içeriğinde çeşitli elektrik "
-                                + "ve aydınlatma sembolleri mevcuttur. "
-                                + "Bu sembollerin komutları sembollerin "
-                                + "adları ile aynıdır."
-                                + "\n\n   Çizdirmek istediğiniz sembolün "
-                                + "komutunu kullanıldığında kullanıcıdan "
-                                + "sembolün çizileceği noktayı seçmesi istenecektir ve "
-                                + "seçimin ardından sembol çizimi gerçekleştirilecektir. "
-                                + "Bazı semboller \"R\" veya \"E\" tuşları ile döndürülebilir."
-                                + "\n\n   Sembol listesi aşağıdaki gibidir:"
-                                + "\n     * Anahtar"
-                                + "\n     * Aplik"
-                                + "\n     * Armatür"
-                                + "\n     * Avize"
-                                + "\n     * Buat"
-                                + "\n     * Komütatör"
-                                + "\n     * Priz";
+            messageBody.Text = "\n" + "   There are various electrical and " +
+                                "lighting symbols in the plugin content. " +
+                                "The commands of these symbols are the " +
+                                "same as the names of the symbols. " +
+                                "\n\n   When using the command, the user " +
+                                "will be prompted to select the point " +
+                                "where the symbol will be drawn. " +
+                                "After the selection, the drawing will be done. " +
+                                "Some symbols can be rotated with the “R” or “E” keys. "
+                                + "\n\n   The symbol list (commands) is as follows:"
+                                + "\n     * Switch"
+                                + "\n     * Sconce"
+                                + "\n     * Armature"
+                                + "\n     * Chandelier"
+                                + "\n     * JunctionBox"
+                                + "\n     * CommutatorSwitch"
+                                + "\n     * Socket";
             messageBody.Dock = WinForms.DockStyle.Top;
             messageBody.ReadOnly = true;
             messageBody.ScrollBars = WinForms.RichTextBoxScrollBars.Vertical;
@@ -2067,8 +2060,8 @@ namespace Line_and_Symbol
             messageControl.Controls.Add(messageBody);
 
             // Create a new palette and add the message control
-            newPalette = new PaletteSet("Sembol Komutları");
-            newPalette.Add("LS", messageControl);
+            newPalette = new PaletteSet("Symbol Commands");
+            newPalette.Add("Symbols", messageControl);
             newPalette.Size = new Size(200, 150);
 
             BackButton(messageControl, newPalette);
@@ -2082,7 +2075,7 @@ namespace Line_and_Symbol
         private void HomeButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();        // Create button
-            buttonLS.Text = "Ana Menü";                  // Button name
+            buttonLS.Text = "Main Menu";                  // Button name
             buttonLS.Dock = WinForms.DockStyle.Bottom;   // Button will be at bottom
             buttonLS.Click += (sender, e) =>             // Button click event
             {
@@ -2095,7 +2088,7 @@ namespace Line_and_Symbol
         private void LSButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Hat ve Sembol Nedir?";
+            buttonLS.Text = "What is Line and Symbol?";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2107,7 +2100,7 @@ namespace Line_and_Symbol
         private void CommandsButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Komutlar";
+            buttonLS.Text = "Commands";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2119,7 +2112,7 @@ namespace Line_and_Symbol
         private void LinyeButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Linye Komutu";
+            buttonLS.Text = "Line Command";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2131,7 +2124,7 @@ namespace Line_and_Symbol
         private void SortiButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Sorti Komutu";
+            buttonLS.Text = "Branching Command";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2143,7 +2136,7 @@ namespace Line_and_Symbol
         private void EnlightButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Aydınlatma Komutu";
+            buttonLS.Text = "Illuminate Command";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2155,7 +2148,7 @@ namespace Line_and_Symbol
         private void SymbolButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Sembol Komutları";
+            buttonLS.Text = "Symbol Command";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2167,7 +2160,7 @@ namespace Line_and_Symbol
         private void BackButton(UserControl messageControl, PaletteSet paletteSet)
         {
             var buttonLS = new WinForms.Button();
-            buttonLS.Text = "Geri";
+            buttonLS.Text = "Back";
             buttonLS.Dock = WinForms.DockStyle.Bottom;
             buttonLS.Click += (sender, e) =>
             {
@@ -2180,7 +2173,7 @@ namespace Line_and_Symbol
         {
 
             var buttonClose = new WinForms.Button();
-            buttonClose.Text = "Kapat";
+            buttonClose.Text = "Close";
             buttonClose.Dock = WinForms.DockStyle.Bottom;
             buttonClose.Click += (sender, e) =>
             {
